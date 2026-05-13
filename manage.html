@@ -192,7 +192,7 @@ footer{margin-top:10px;text-align:center;color:var(--text-secondary);font-size:9
   <div class="modal" style="max-width:380px">
     <div class="modal-head">
       <h2 id="moneyTitle">💰 송금 기록</h2>
-      <button class="modal-close" onclick="closeMoneyModal()">✕</button>
+      <button class="modal-close" onclick="closeTxModal()">✕</button>
     </div>
     <!-- 총계 -->
     <div id="moneyTotals" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap"></div>
@@ -205,14 +205,10 @@ footer{margin-top:10px;text-align:center;color:var(--text-secondary);font-size:9
           <input type="date" id="mx-date" style="flex:1;background:var(--bg-secondary);border:1px solid var(--border);border-radius:5px;padding:4px 7px;font-size:11px;color:var(--text-primary);font-family:inherit"/>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
-          <span style="font-size:10px;color:var(--text-secondary);width:52px;flex-shrink:0">📤 보낸금액</span>
+          <span style="font-size:10px;color:var(--text-secondary);width:52px;flex-shrink:0">💰 금액</span>
           <input type="number" id="mx-sent" placeholder="0" style="flex:1;background:var(--bg-secondary);border:1px solid var(--border);border-radius:5px;padding:4px 7px;font-size:11px;color:var(--text-primary);font-family:inherit"/>
         </div>
-        <div style="display:flex;align-items:center;gap:6px">
-          <span style="font-size:10px;color:var(--text-secondary);width:52px;flex-shrink:0">📥 받은금액</span>
-          <input type="number" id="mx-recv" placeholder="0" style="flex:1;background:var(--bg-secondary);border:1px solid var(--border);border-radius:5px;padding:4px 7px;font-size:11px;color:var(--text-primary);font-family:inherit"/>
-        </div>
-        <button onclick="addMoneyTx()" style="background:var(--accent);border:none;color:#0f172a;font-weight:700;padding:6px;border-radius:7px;font-size:11px;cursor:pointer;font-family:inherit;margin-top:2px">+ 추가</button>
+        <button onclick="addTx()" style="background:var(--accent);border:none;color:#0f172a;font-weight:700;padding:6px;border-radius:7px;font-size:11px;cursor:pointer;font-family:inherit;margin-top:2px">+ 추가</button>
       </div>
     </div>
     <!-- 기록 목록 -->
@@ -501,86 +497,70 @@ function mkCopy(getVal){
 }
 
 // ── 송금 누적 모달 ─────────────────────────────
-let moneyTarget=null
+let txTarget=null  // {r, type:'sent'|'recv', refreshBtn}
 
-function openMoneyModal(r,refreshBtn){
-  moneyTarget={r,refreshBtn}
-  document.getElementById('moneyTitle').textContent=`💰 ${r.name||'리뷰어'+r.slot} 송금 기록`
+function openTxModal(r,type,refreshBtn){
+  txTarget={r,type,refreshBtn}
+  const label=type==='sent'?'📤 송금함':'📥 송금받음'
+  document.getElementById('moneyTitle').textContent=`${label} - ${r.name||'리뷰어'+r.slot}`
   document.getElementById('mx-date').value=TODAY
   document.getElementById('mx-sent').value=''
   document.getElementById('mx-recv').value=''
-  renderMoneyList()
+  renderTxList()
   document.getElementById('moneyModal').classList.add('open')
 }
 
-function closeMoneyModal(){
+function closeTxModal(){
   document.getElementById('moneyModal').classList.remove('open')
-  moneyTarget=null
+  txTarget=null
 }
 
-function renderMoneyList(){
-  if(!moneyTarget)return
-  const {r}=moneyTarget
-  const key=`tx_${uid}_${r.slot}`
+function renderTxList(){
+  if(!txTarget)return
+  const {r,type}=txTarget
+  const key=`tx_${type}_${uid}_${r.slot}`
   const txs=JSON.parse(localStorage.getItem(key)||'[]')
-  const sent=txs.reduce((a,t)=>a+(t.sent||0),0)
-  const recv=txs.reduce((a,t)=>a+(t.recv||0),0)
-  const net=sent-recv
+  const tot=txs.reduce((a,t)=>a+(t.amt||0),0)
   document.getElementById('moneyTotals').innerHTML=`
-    <div style="flex:1;background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.25);border-radius:8px;padding:7px 10px;text-align:center">
-      <p style="font-size:9px;color:#60a5fa;font-weight:600">📤 총 보낸금액</p>
-      <p style="font-size:14px;font-weight:700;color:#60a5fa">${sent.toLocaleString()}원</p>
-    </div>
-    <div style="flex:1;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:8px;padding:7px 10px;text-align:center">
-      <p style="font-size:9px;color:#4ade80;font-weight:600">📥 총 받은금액</p>
-      <p style="font-size:14px;font-weight:700;color:#4ade80">${recv.toLocaleString()}원</p>
-    </div>
-    <div style="flex:1;background:${net>0?'rgba(251,191,36,.1)':net<0?'rgba(248,113,113,.1)':'rgba(100,116,139,.1)'};border:1px solid ${net>0?'rgba(251,191,36,.25)':net<0?'rgba(248,113,113,.25)':'rgba(100,116,139,.25)'};border-radius:8px;padding:7px 10px;text-align:center">
-      <p style="font-size:9px;color:${net>0?'#fbbf24':net<0?'#f87171':'var(--text-secondary)'};font-weight:600">⚖️ 순 차이</p>
-      <p style="font-size:14px;font-weight:700;color:${net>0?'#fbbf24':net<0?'#f87171':'var(--text-secondary)'}">${net>0?'+':''}${net.toLocaleString()}원</p>
+    <div style="flex:1;background:${type==='sent'?'rgba(96,165,250,.1)':'rgba(74,222,128,.1)'};border:1px solid ${type==='sent'?'rgba(96,165,250,.25)':'rgba(74,222,128,.25)'};border-radius:8px;padding:7px 10px;text-align:center">
+      <p style="font-size:9px;color:${type==='sent'?'#60a5fa':'#4ade80'};font-weight:600">${type==='sent'?'📤 총 송금액':'📥 총 수금액'}</p>
+      <p style="font-size:14px;font-weight:700;color:${type==='sent'?'#60a5fa':'#4ade80'}">${tot.toLocaleString()}원</p>
     </div>
   `
   const el=document.getElementById('moneyList')
   if(!txs.length){el.innerHTML='<p style="text-align:center;color:var(--text-secondary);font-size:11px;padding:16px">기록이 없습니다</p>';return}
   el.innerHTML=txs.map((t,i)=>`
-    <div style="display:flex;align-items:center;gap:6px;background:var(--bg-primary);border:1px solid var(--border);border-radius:7px;padding:7px 10px;margin-bottom:5px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:6px;background:var(--bg-primary);border:1px solid var(--border);border-radius:7px;padding:7px 10px;margin-bottom:5px">
       <span style="font-size:10px;color:var(--text-secondary);flex-shrink:0">📅 ${t.date||''}</span>
-      ${t.sent?`<span style="font-size:11px;color:#60a5fa;font-weight:600">📤 ${t.sent.toLocaleString()}원</span>`:''}
-      ${t.recv?`<span style="font-size:11px;color:#4ade80;font-weight:600">📥 ${t.recv.toLocaleString()}원</span>`:''}
-      <button onclick="deleteMoneyTx(${i})" style="margin-left:auto;background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:12px;padding:0">🗑</button>
+      <span style="font-size:11px;color:${type==='sent'?'#60a5fa':'#4ade80'};font-weight:600">${t.amt.toLocaleString()}원</span>
+      <button onclick="deleteTx(${i})" style="margin-left:auto;background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:12px;padding:0">🗑</button>
     </div>
   `).join('')
 }
 
-function addMoneyTx(){
-  if(!moneyTarget)return
-  const {r,refreshBtn}=moneyTarget
+function addTx(){
+  if(!txTarget)return
+  const {r,type,refreshBtn}=txTarget
   const date=document.getElementById('mx-date').value||TODAY
-  const sent=parseInt(document.getElementById('mx-sent').value)||0
-  const recv=parseInt(document.getElementById('mx-recv').value)||0
-  if(!sent&&!recv){alert('금액을 입력해주세요');return}
-  const key=`tx_${uid}_${r.slot}`
+  const amt=parseInt(document.getElementById('mx-sent').value)||0
+  if(!amt){alert('금액을 입력해주세요');return}
+  const key=`tx_${type}_${uid}_${r.slot}`
   const txs=JSON.parse(localStorage.getItem(key)||'[]')
-  txs.unshift({date,sent,recv})
+  txs.unshift({date,amt})
   localStorage.setItem(key,JSON.stringify(txs))
-  const totalSent=txs.reduce((a,t)=>a+(t.sent||0),0)
-  r.reward=totalSent;saveRow(r);renderStats()
   document.getElementById('mx-sent').value=''
-  document.getElementById('mx-recv').value=''
-  renderMoneyList();refreshBtn()
+  renderTxList();refreshBtn()
 }
 
-function deleteMoneyTx(idx){
-  if(!moneyTarget)return
+function deleteTx(idx){
+  if(!txTarget)return
   if(!confirm('이 기록을 삭제할까요?'))return
-  const {r,refreshBtn}=moneyTarget
-  const key=`tx_${uid}_${r.slot}`
+  const {r,type,refreshBtn}=txTarget
+  const key=`tx_${type}_${uid}_${r.slot}`
   const txs=JSON.parse(localStorage.getItem(key)||'[]')
   txs.splice(idx,1)
   localStorage.setItem(key,JSON.stringify(txs))
-  const totalSent=txs.reduce((a,t)=>a+(t.sent||0),0)
-  r.reward=totalSent;saveRow(r);renderStats()
-  renderMoneyList();refreshBtn()
+  renderTxList();refreshBtn()
 }
 
 function openKb(r,btn){
@@ -694,24 +674,24 @@ function mkRow(r){
   tr.updateBadge=updateBadge
 
   // 상태 칸 — 두 줄 (라벨 제거, 파스텔 색상, 작은 크기)
-  const ts=document.createElement('td');ts.style.cssText='padding:2px 4px;min-width:90px'
+  const ts=document.createElement('td');ts.style.cssText='padding:1px 2px;min-width:70px'
 
   const mkSel=(statusVal,onChange)=>{
     const sel=document.createElement('select');sel.className='ss'
-    sel.style.cssText='font-size:10px;padding:2px 4px;width:100%'
+    sel.style.cssText='font-size:9px;padding:1px 3px;width:100%'
     ;['대기중','진행중','완료'].forEach(v=>{
       const o=document.createElement('option');o.value=v;o.textContent=v
       if(v===statusVal)o.selected=true;sel.append(o)
     })
     const updColor=()=>{
       if(sel.value==='완료'){
-        sel.style.background='#fca5a5';sel.style.color='#5a4a42'
-        sel.style.borderColor='#f8b4b4';sel.style.fontWeight='600'
+        sel.style.background='rgba(252,165,165,0.4)';sel.style.color='#5a4a42'
+        sel.style.borderColor='rgba(248,180,180,0.5)';sel.style.fontWeight='600'
       }else if(sel.value==='진행중'){
-        sel.style.background='#fed7aa';sel.style.color='#5a4a42'
-        sel.style.borderColor='#fdba74';sel.style.fontWeight='600'
+        sel.style.background='rgba(254,215,170,0.4)';sel.style.color='#5a4a42'
+        sel.style.borderColor='rgba(253,186,116,0.5)';sel.style.fontWeight='600'
       }else{
-        sel.style.background='var(--bg-primary)';sel.style.color='var(--text-secondary)'
+        sel.style.background='rgba(100,116,139,0.15)';sel.style.color='var(--text-secondary)'
         sel.style.borderColor='var(--border)';sel.style.fontWeight='400'
       }
     }
@@ -744,26 +724,32 @@ function mkRow(r){
   id2.onchange=()=>{localStorage.setItem(d2Key,id2.value)}
   td.append(id,id2);tr.append(td)
 
-  // 송금 칸 — 두 줄 (요청함/요청받음)
+  // 송금 칸 — 두 줄 (송금함/송금받음)
   const tr2=document.createElement('td');tr2.style.cssText='padding:2px 4px'
   
-  // 송금1 (요청함)
-  const moneyBtn=document.createElement('button')
-  const getTxList=()=>JSON.parse(localStorage.getItem(`tx_${uid}_${r.slot}`)||'[]')
-  const calcTotal=txs=>({sent:txs.reduce((a,t)=>a+(t.sent||0),0),recv:txs.reduce((a,t)=>a+(t.recv||0),0)})
-  const refreshMoneyBtn=()=>{
-    const txs=getTxList();const tot=calcTotal(txs)
-    moneyBtn.textContent=txs.length?`${tot.sent.toLocaleString()}원`:'기록 없음'
-    moneyBtn.style.cssText=`background:${txs.length?'rgba(74,222,128,.1)':'var(--bg-primary)'};border:1px solid ${txs.length?'rgba(74,222,128,.3)':'var(--border)'};color:${txs.length?'#4ade80':'var(--text-secondary)'};border-radius:4px;padding:2px 6px;font-size:9px;cursor:pointer;font-family:inherit;white-space:nowrap;width:100%`
+  // 송금함 (보낸 금액)
+  const moneyBtnSent=document.createElement('button')
+  const getTxListSent=()=>JSON.parse(localStorage.getItem(`tx_sent_${uid}_${r.slot}`)||'[]')
+  const refreshMoneyBtnSent=()=>{
+    const txs=getTxListSent();const tot=txs.reduce((a,t)=>a+(t.amt||0),0)
+    moneyBtnSent.textContent=txs.length?`${tot.toLocaleString()}원`:'기록 없음'
+    moneyBtnSent.style.cssText=`background:${txs.length?'rgba(96,165,250,.1)':'var(--bg-primary)'};border:1px solid ${txs.length?'rgba(96,165,250,.3)':'var(--border)'};color:${txs.length?'#60a5fa':'var(--text-secondary)'};border-radius:4px;padding:2px 6px;font-size:9px;cursor:pointer;font-family:inherit;white-space:nowrap;width:100%;margin-bottom:2px`
   }
-  refreshMoneyBtn()
-  moneyBtn.onclick=()=>openMoneyModal(r,refreshMoneyBtn)
+  refreshMoneyBtnSent()
+  moneyBtnSent.onclick=()=>openTxModal(r,'sent',refreshMoneyBtnSent)
   
-  // 송금2 (요청받음 - 텍스트)
-  const moneyText2=document.createElement('div');moneyText2.style.cssText='font-size:9px;color:var(--text-secondary);padding:2px 4px;margin-top:2px'
-  moneyText2.textContent='-'
+  // 송금받음 (받은 금액)
+  const moneyBtnRecv=document.createElement('button')
+  const getTxListRecv=()=>JSON.parse(localStorage.getItem(`tx_recv_${uid}_${r.slot}`)||'[]')
+  const refreshMoneyBtnRecv=()=>{
+    const txs=getTxListRecv();const tot=txs.reduce((a,t)=>a+(t.amt||0),0)
+    moneyBtnRecv.textContent=txs.length?`${tot.toLocaleString()}원`:'기록 없음'
+    moneyBtnRecv.style.cssText=`background:${txs.length?'rgba(74,222,128,.1)':'var(--bg-primary)'};border:1px solid ${txs.length?'rgba(74,222,128,.3)':'var(--border)'};color:${txs.length?'#4ade80':'var(--text-secondary)'};border-radius:4px;padding:2px 6px;font-size:9px;cursor:pointer;font-family:inherit;white-space:nowrap;width:100%`
+  }
+  refreshMoneyBtnRecv()
+  moneyBtnRecv.onclick=()=>openTxModal(r,'recv',refreshMoneyBtnRecv)
   
-  tr2.append(moneyBtn,moneyText2);tr.append(tr2)
+  tr2.append(moneyBtnSent,moneyBtnRecv);tr.append(tr2)
 
   // 계좌 칸 — 두 줄 (요청함/요청받음)
   const ta=document.createElement('td');ta.style.cssText='padding:2px 4px'
