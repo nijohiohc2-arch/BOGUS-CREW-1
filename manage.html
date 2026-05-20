@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>내 관리 페이지 — 보거스 CREW v13</title>
+<title>내 관리 페이지 — 보거스 CREW v17-number-fixed</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -659,13 +659,14 @@ function saveKb(){
 function updK(b,r){b.className='kbtn '+(r.kakao_url?'kl':'ke');b.textContent=r.kakao_url?'💬':'💬'}
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('kbBg').classList.contains('open'))saveKb();if(e.key==='Escape')closeKb()})
 
-function mkRow(r){
+function mkRow(r, visualIndex){
   const tr=document.createElement('tr')
   const d=(r.requested||0)-(r.received||0)
   if(d>0)tr.classList.add('over');else if(d<0)tr.classList.add('under')
 
-  // 번호 — 리뷰어 고유 번호로 고정. 행을 이동해도 번호는 바뀌지 않음
-  const tn=document.createElement('td');tn.className='n';tn.textContent=String(r.slot).padStart(2,'0');tr.append(tn)
+  // 번호 — 화면 위치 기준 고정 번호.
+  // 리뷰어 행을 이동해도 이 번호는 사람/slot을 따라가지 않고 현재 줄 위치(01,02,03...)로 다시 표시됨.
+  const tn=document.createElement('td');tn.className='n';tn.textContent=String((visualIndex||0)+1).padStart(2,'0');tr.append(tn)
 
   // ☰ 드래그 핸들 (번호 오른쪽)
   const th=document.createElement('td');th.style.cssText='padding:0 4px;text-align:center'
@@ -964,10 +965,17 @@ function updateStickyLeft(){
 }
 window.addEventListener('resize',()=>setTimeout(updateStickyLeft,50))
 
+function refreshVisualNumbers(){
+  document.querySelectorAll('#tb tr').forEach((tr,i)=>{
+    const cell=tr.children[0]
+    if(cell) cell.textContent=String(i+1).padStart(2,'0')
+  })
+}
+
 function renderTbl(){
   const tb=document.getElementById('tb')
   tb.innerHTML=''
-  data.forEach(r=>tb.append(mkRow(r)))
+  data.forEach((r,i)=>tb.append(mkRow(r,i)))
   
   // 기존 SortableJS 제거
   if(tb.sortableInstance) tb.sortableInstance.destroy()
@@ -980,6 +988,7 @@ function renderTbl(){
     onEnd:function(evt){
       const moved=data.splice(evt.oldIndex,1)[0]
       data.splice(evt.newIndex,0,moved)
+      refreshVisualNumbers()
       renderTbl()
     }
   })
