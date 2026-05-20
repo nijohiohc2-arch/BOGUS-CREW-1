@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>내 관리 페이지 — 보거스 CREW v9</title>
+<title>내 관리 페이지 — 보거스 CREW v13</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -80,28 +80,36 @@ nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:
 .tw{background:var(--bg-secondary);border:1px solid var(--border);border-radius:10px;overflow:hidden}
 .ts{overflow-x:auto}
 table{border-collapse:collapse}
-/* 번호는 맨 앞, 이동 핸들은 번호 오른쪽 */
+/* 번호는 맨 앞에 고정, 이동 핸들은 번호 오른쪽에 고정 */
 table th:nth-child(1), table td:nth-child(1){
+  position:sticky;
+  left:0;
   min-width:36px;
   width:36px;
   max-width:36px;
   text-align:center;
+  background:var(--bg-secondary);
+  z-index:34;
 }
 table th:nth-child(2), table td:nth-child(2){
+  position:sticky;
+  left:var(--sticky-handle-left,36px);
   min-width:24px;
   width:24px;
   max-width:24px;
   text-align:center;
   padding-left:2px;
   padding-right:2px;
+  background:var(--bg-secondary);
+  z-index:33;
 }
-/* 가로 스크롤 시 이름(3번째) + 품앗이 라벨(5번째)만 고정.
+/* 가로 스크롤 시 번호 + 핸들 + 이름 + 품앗이 라벨만 고정.
    카톡(4번째)은 가로 표기로 유지하고, 수량/±는 스크롤 시 접힘 */
 table th:nth-child(3), table td:nth-child(3){
   position:sticky;
-  left:0;
+  left:var(--sticky-name-left,60px);
   background:var(--bg-secondary);
-  z-index:30;
+  z-index:32;
   white-space:nowrap;
 }
 /* 카톡: 이름 다음, 가로 한 줄 표시 */
@@ -139,6 +147,8 @@ table th:nth-child(5), table td:nth-child(5){
   box-shadow:8px 0 14px -12px rgba(0,0,0,.7);
 }
 table thead th,
+table thead th:nth-child(1),
+table thead th:nth-child(2),
 table thead th:nth-child(3),
 table thead th:nth-child(4),
 table thead th:nth-child(5),
@@ -941,10 +951,16 @@ function mkRow(r){
 }
 
 function updateStickyLeft(){
+  const numCol=document.querySelector('table tbody td:nth-child(1), table thead th:nth-child(1)')
+  const handleCol=document.querySelector('table tbody td:nth-child(2), table thead th:nth-child(2)')
   const nameCol=document.querySelector('table tbody td:nth-child(3), table thead th:nth-child(3)')
-  if(!nameCol)return
-  const w=Math.ceil(nameCol.getBoundingClientRect().width||nameCol.offsetWidth||82)
-  document.documentElement.style.setProperty('--sticky-pumasi-left',w+'px')
+  if(!numCol||!handleCol||!nameCol)return
+  const numW=Math.ceil(numCol.getBoundingClientRect().width||numCol.offsetWidth||36)
+  const handleW=Math.ceil(handleCol.getBoundingClientRect().width||handleCol.offsetWidth||24)
+  const nameW=Math.ceil(nameCol.getBoundingClientRect().width||nameCol.offsetWidth||82)
+  document.documentElement.style.setProperty('--sticky-handle-left',numW+'px')
+  document.documentElement.style.setProperty('--sticky-name-left',(numW+handleW)+'px')
+  document.documentElement.style.setProperty('--sticky-pumasi-left',(numW+handleW+nameW)+'px')
 }
 window.addEventListener('resize',()=>setTimeout(updateStickyLeft,50))
 
