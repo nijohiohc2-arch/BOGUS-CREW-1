@@ -88,7 +88,7 @@ kbd,.chip{display:inline-block;font-family:inherit;font-size:12px;font-weight:70
 
 /* 한눈에 보기 흐름 */
 .flow{display:grid;grid-template-columns:1fr;gap:10px;counter-reset:f}
-.flow a{display:flex;align-items:center;gap:12px;text-decoration:none;background:rgba(30,41,59,.85);border:1px solid #334155;border-radius:14px;padding:13px 14px;transition:.2s}
+.flow a{display:flex;align-items:center;gap:12px;text-decoration:none;background:#1b263a;border:1px solid #334155;border-radius:14px;padding:13px 14px;transition:border-color .2s,transform .2s}
 .flow a:hover{border-color:rgba(222,255,154,.5);transform:translateY(-2px)}
 .flow .ic{font-size:24px;width:44px;height:44px;border-radius:12px;background:#0f172a;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .flow b{display:block;font-size:15px;color:#fff}
@@ -460,7 +460,7 @@ footer{text-align:center;color:#475569;font-size:11.5px;margin-top:36px}
     es.forEach(e=>{
       if(e.isIntersecting){
         links.forEach(l=>l.classList.remove('on'))
-        const a=map.get(e.target.id);if(a){a.classList.add('on');a.scrollIntoView({block:'nearest',inline:'center'})}
+        const a=map.get(e.target.id);if(a){a.classList.add('on');const t=a.parentElement;if(t&&t.scrollWidth>t.clientWidth){t.scrollLeft=a.offsetLeft-(t.clientWidth-a.offsetWidth)/2}}
       }
     })
   },{rootMargin:'-30% 0px -60% 0px'})
