@@ -15,7 +15,7 @@ img{display:block;max-width:100%;height:auto}
 
 /* 배경 (메인 페이지와 동일한 은은한 원) */
 .bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
-.bg span{position:absolute;border-radius:50%;opacity:.10;animation:float 8s ease-in-out infinite}
+.bg span{position:absolute;border-radius:50%;opacity:.10}
 .bg span:nth-child(1){width:300px;height:300px;background:#deff9a;top:-80px;left:-80px}
 .bg span:nth-child(2){width:200px;height:200px;background:#60a5fa;bottom:10%;right:-60px;animation-delay:2s}
 .bg span:nth-child(3){width:150px;height:150px;background:#a78bfa;top:45%;left:-40px;animation-delay:4s}
@@ -24,7 +24,7 @@ img{display:block;max-width:100%;height:auto}
 .wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:0 16px 56px}
 
 /* 상단 바 */
-.topbar{position:sticky;top:0;z-index:50;background:rgba(10,15,30,.86);backdrop-filter:blur(12px);border-bottom:1px solid #1e293b}
+.topbar{position:sticky;top:0;z-index:50;background:#0a0f1e;border-bottom:1px solid #1e293b}
 .topbar .in{max-width:960px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
 .back-btn{display:flex;align-items:center;color:#94a3b8;text-decoration:none;font-size:13px;background:rgba(100,116,139,.1);border:1px solid #334155;padding:6px 12px;border-radius:8px;white-space:nowrap;flex-shrink:0}
 .back-btn:hover{color:#f1f5f9}
@@ -58,7 +58,7 @@ section{margin-top:44px}
 .lead b,.card b{color:#deff9a;font-weight:700}
 
 /* 카드 / 단계 레이아웃 */
-.card{background:rgba(30,41,59,.85);border:1px solid #334155;border-radius:20px;padding:20px;backdrop-filter:blur(12px)}
+.card{background:#1b263a;border:1px solid #334155;border-radius:20px;padding:20px}
 .step{display:grid;grid-template-columns:1fr;gap:18px;align-items:start}
 .step .txt{display:flex;flex-direction:column;gap:12px}
 .step .shots{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
@@ -246,11 +246,11 @@ footer{text-align:center;color:#475569;font-size:11.5px;margin-top:36px}
       </div>
       <div class="shots">
         <figure>
-          <div class="frame"><img src="guide-assets/01-signup.png" alt="크루 가입 탭 화면: 이름, 비밀번호 입력과 가입 버튼" width="780" height="1960"/></div>
+          <div class="frame"><img loading="lazy" decoding="async" src="guide-assets/01-signup.png" alt="크루 가입 탭 화면: 이름, 비밀번호 입력과 가입 버튼" width="780" height="1960"/></div>
           <figcaption><span class="tag-real">실제 화면</span>가입 탭 ①이름 ②비밀번호 ③가입 ④로그인 탭</figcaption>
         </figure>
         <figure>
-          <div class="frame"><img src="guide-assets/02-login.png" alt="로그인 탭 화면: 이름과 비밀번호 입력, 로그인 버튼" width="780" height="1960"/></div>
+          <div class="frame"><img loading="lazy" decoding="async" src="guide-assets/02-login.png" alt="로그인 탭 화면: 이름과 비밀번호 입력, 로그인 버튼" width="780" height="1960"/></div>
           <figcaption><span class="tag-real">실제 화면</span>로그인 탭 (입력값은 예시)</figcaption>
         </figure>
       </div>
@@ -271,7 +271,7 @@ footer{text-align:center;color:#475569;font-size:11.5px;margin-top:36px}
       </div>
       <div class="shots">
         <figure>
-          <div class="frame"><img src="guide-assets/03-loggedin.png" alt="로그인 후 메인 화면: 내 관리 페이지 열기 버튼" width="780" height="1560"/></div>
+          <div class="frame"><img loading="lazy" decoding="async" src="guide-assets/03-loggedin.png" alt="로그인 후 메인 화면: 내 관리 페이지 열기 버튼" width="780" height="1560"/></div>
           <figcaption><span class="tag-sample">예시 화면</span>로그인 후 메인</figcaption>
         </figure>
       </div>
@@ -292,7 +292,7 @@ footer{text-align:center;color:#475569;font-size:11.5px;margin-top:36px}
       </div>
       <div class="shots">
         <figure>
-          <div class="frame"><img src="guide-assets/04-manage.png" alt="관리 페이지 상단: 비밀번호, 통계 공개, 요약, 날짜별 완료 통계, 기록 표" width="780" height="1600"/></div>
+          <div class="frame"><img loading="lazy" decoding="async" src="guide-assets/04-manage.png" alt="관리 페이지 상단: 비밀번호, 통계 공개, 요약, 날짜별 완료 통계, 기록 표" width="780" height="1600"/></div>
           <figcaption><span class="tag-sample">예시 화면</span>①비밀번호 ②통계 공개 ③크루 현황 ④요약 ⑤날짜별 통계 ⑥수량</figcaption>
         </figure>
       </div>
@@ -316,7 +316,7 @@ footer{text-align:center;color:#475569;font-size:11.5px;margin-top:36px}
       </div>
       <div class="shots">
         <figure>
-          <div class="frame"><img src="guide-assets/05-manage-status.png" alt="기록 표를 옆으로 밀어 상태와 날짜 칸을 보여주는 화면" width="780" height="1040"/></div>
+          <div class="frame"><img loading="lazy" decoding="async" src="guide-assets/05-manage-status.png" alt="기록 표를 옆으로 밀어 상태와 날짜 칸을 보여주는 화면" width="780" height="1040"/></div>
           <figcaption><span class="tag-sample">예시 화면</span>①± 배지 ②상태 ③날짜</figcaption>
         </figure>
       </div>
@@ -339,15 +339,15 @@ footer{text-align:center;color:#475569;font-size:11.5px;margin-top:36px}
       </div>
       <div class="shots">
         <figure>
-          <div class="frame"><img src="guide-assets/06-manage-money.png" alt="기록 표를 옆으로 밀어 송금액과 계좌 칸을 보여주는 화면" width="780" height="1040"/></div>
+          <div class="frame"><img loading="lazy" decoding="async" src="guide-assets/06-manage-money.png" alt="기록 표를 옆으로 밀어 송금액과 계좌 칸을 보여주는 화면" width="780" height="1040"/></div>
           <figcaption><span class="tag-sample">예시 화면</span>①송금액 버튼 ②계좌 입력</figcaption>
         </figure>
         <figure>
-          <div class="frame"><img src="guide-assets/07-money-modal.png" alt="송금액 기록 창: 날짜와 금액 입력, 기록 목록" width="780" height="1600"/></div>
+          <div class="frame"><img loading="lazy" decoding="async" src="guide-assets/07-money-modal.png" alt="송금액 기록 창: 날짜와 금액 입력, 기록 목록" width="780" height="1600"/></div>
           <figcaption><span class="tag-sample">예시 화면</span>송금액 기록 창</figcaption>
         </figure>
         <figure>
-          <div class="frame"><img src="guide-assets/08-kakao-modal.png" alt="카톡 연결 창: 오픈채팅 URL 입력" width="780" height="1600"/></div>
+          <div class="frame"><img loading="lazy" decoding="async" src="guide-assets/08-kakao-modal.png" alt="카톡 연결 창: 오픈채팅 URL 입력" width="780" height="1600"/></div>
           <figcaption><span class="tag-sample">예시 화면</span>카톡 연결 창</figcaption>
         </figure>
       </div>
@@ -371,7 +371,7 @@ footer{text-align:center;color:#475569;font-size:11.5px;margin-top:36px}
       </div>
       <div class="shots">
         <figure>
-          <div class="frame"><img src="guide-assets/09-dashboard.png" alt="활동 현황 대시보드: 요약 카드와 크루 순위 목록" width="780" height="1600"/></div>
+          <div class="frame"><img loading="lazy" decoding="async" src="guide-assets/09-dashboard.png" alt="활동 현황 대시보드: 요약 카드와 크루 순위 목록" width="780" height="1600"/></div>
           <figcaption><span class="tag-sample">예시 화면</span>활동 현황 (샘플 이름·숫자)</figcaption>
         </figure>
       </div>
