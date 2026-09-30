@@ -14,7 +14,7 @@ jobs:
           URL="https://ewuimpdposvcoaeqkcrc.supabase.co"
           KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3dWltcGRwb3N2Y29hZXFrY3JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4NjU1NzUsImV4cCI6MjA5MzQ0MTU3NX0.EF9WqvNY2D_l6yKYh-BR7FQVwj-12Z4D94sIupmaS4k"
           for path in "/rest/v1/profiles?select=id&limit=1" "/auth/v1/health"; do
-            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 --retry 3 --retry-delay 10 -H "apikey: $KEY" -H "Authorization: Bearer $KEY" "$URL$path" || echo 000)
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 --retry 3 --retry-delay 10 -H "apikey: $KEY" -H "Authorization: Bearer $KEY" "$URL$path" || true)
             echo "$path -> HTTP $code"
-            if [ "$code" = "000" ]; then echo "Supabase에 연결 실패 (일시중지/삭제 가능성)"; exit 1; fi
+            if [ "$code" = "000" ] || [ -z "$code" ]; then echo "Supabase에 연결 실패 (일시중지/삭제 가능성)"; exit 1; fi
           done
