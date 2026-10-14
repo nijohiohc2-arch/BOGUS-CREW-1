@@ -11,8 +11,8 @@ jobs:
     steps:
       - name: Ping Supabase (DB + Auth)
         run: |
-          URL="https://ewuimpdposvcoaeqkcrc.supabase.co"
-          KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3dWltcGRwb3N2Y29hZXFrY3JjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4NjU1NzUsImV4cCI6MjA5MzQ0MTU3NX0.EF9WqvNY2D_l6yKYh-BR7FQVwj-12Z4D94sIupmaS4k"
+          URL="https://bjargpqcyixokopccqun.supabase.co"
+          KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqYXJncHFjeWl4b2tvcGNjcXVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA3MzI4NTAsImV4cCI6MjEwNjMwODg1MH0.OXtgbxzC2-tUtRWjR6aT5YNnaxylZ2cRlcvvmav99tI"
           for path in "/rest/v1/profiles?select=id&limit=1" "/auth/v1/health"; do
             code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 --retry 3 --retry-delay 10 -H "apikey: $KEY" -H "Authorization: Bearer $KEY" "$URL$path" || true)
             echo "$path -> HTTP $code"
